@@ -8,7 +8,7 @@ import { map } from 'rxjs';
 
 @Component({
   selector: 'app-kyc',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, forwardRef(() => SafeUrlPipe)],
   templateUrl: './kyc.html',
   styleUrl: './kyc.css',
 })
@@ -40,28 +40,32 @@ export class Kyc implements OnInit {
   rejectionReason = '';
   searchQuery = '';
 
-  openReview(item: any) {
-    this.selectedUser = item;
-    this.selectedDocUrl = null;
-    this.showRejectionInput = false;
+ openReview(item: any) {
+  this.selectedUser = item;
+  this.selectedDocUrl = null; // Reset previous doc while loading new one
+  this.showRejectionInput = false;
 
-    const path = item.documents[0]?.document_url;
-    if (path) {
-      this.kycService.getDocumentUrl(path).subscribe({
-        next: (res) => this.selectedDocUrl = res, // res is { url: "..." }
-        error: (err) => console.error('Error fetching signed URL', err)
-      });
-    }
-  }
+  const path = item.documents[0]?.document_url;
+  if (path) {
+    this.kycService.getDocumentUrl(path).subscribe({
+      next: (res) => {
+        this.selectedDocUrl = res; // res should be { url: "..." }
+      },
+      error: (err) => console.error('Error fetching signed URL', err)
+    });
+  }}
 
   getFileType(url: string | null): 'image' | 'pdf' | 'other' {
     if (!url) return 'other';
-    // Remove query params to get the clean filename
-    const cleanUrl = url.split('?')[0];
-    const ext = cleanUrl.split('.').pop()?.toLowerCase();
+    
+    // Supabase signed URLs look like: .../file.pdf?token=xyz
+    // We split by '?' to get the file path, then get the extension
+    const pathWithoutQuery = url.split('?')[0];
+    const ext = pathWithoutQuery.split('.').pop()?.toLowerCase();
 
-    if (['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext!)) return 'image';
+    if (['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'].includes(ext!)) return 'image';
     if (ext === 'pdf') return 'pdf';
+    
     return 'other';
   }
 
