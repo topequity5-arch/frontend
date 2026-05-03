@@ -71,7 +71,7 @@ export class ExploreInvestmentState {
             }),
             catchError(err => {
                 ctx.dispatch(new SetLoading(false))
-                this.notify.show('An error occurred while creating the investment', 'error');
+                this.notify.show(err.error.message ? err.error.message : 'An error occurred while creating the investment', 'error');
                 throw err;
             })
         );
