@@ -60,20 +60,21 @@ export class InvestmentState {
         );
     }
 
-    @Action(UpdateAccruedReturn)
+        @Action(UpdateAccruedReturn)
     updateAccruedReturn(ctx: StateContext<InvestmentStateModel>, { payload }: UpdateAccruedReturn) {
         ctx.dispatch(new SetLoading(true));
 
         return this.service.updateReturn(payload).pipe(
             tap(() => {
                 ctx.dispatch(new SetLoading(false));
+                this.notify.show('Accrued return updated successfully', 'success');
 
                 // Refresh the list to show updated figures
                 ctx.dispatch(new FetchAllInvestments());
             }),
             catchError((err) => {
                 ctx.dispatch(new SetLoading(false));
-                this.notify.show(err, 'error')
+                this.notify.show(err.error?.message || 'Failed to update accrued return', 'error');
                 return of(err);
             }),
             finalize(() => ctx.dispatch(new SetLoading(false)))

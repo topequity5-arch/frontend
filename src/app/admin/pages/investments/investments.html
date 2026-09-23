@@ -112,20 +112,20 @@
 @if (isEditModalOpen) {
 <div class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
   <div class="bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl animate-in zoom-in-95 duration-200">
-    <h3 class="text-xl font-black text-slate-900 mb-1">Adjust Profit</h3>
-    <p class="text-xs text-slate-500 mb-6">Updating accrued return for {{ selectedInvestment?.user?.email }}</p>
+        <h3 class="text-xl font-black text-slate-900 mb-1">Add Accrual Return</h3>
+    <p class="text-xs text-slate-500 mb-6">Adding to accrued return for {{ selectedInvestment?.user?.email }}. Current balance: {{ selectedInvestment?.accrued_return | number:'1.2-2' }}</p>
 
     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-6">
-      <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Accrued Return
+      <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Amount to Add
         ($)</label>
       <input type="number" [(ngModel)]="newProfitValue"
-        class="w-full bg-transparent text-2xl font-black text-slate-900 focus:outline-none" step="0.01">
+        class="w-full bg-transparent text-2xl font-black text-slate-900 focus:outline-none" step="0.01" min="0">
     </div>
 
     <div class="flex flex-col gap-2">
       <button (click)="onSaveProfit()"
         class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all">
-        Update Ledger
+        Add to Accrued Return
       </button>
       <button (click)="isEditModalOpen = false"
         class="text-[10px] font-black text-slate-400 uppercase tracking-widest py-2">Cancel</button>

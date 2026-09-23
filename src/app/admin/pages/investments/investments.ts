@@ -29,14 +29,14 @@ export class Investments implements OnInit {
 
   openEditProfit(inv: any) {
     this.selectedInvestment = inv;
-    this.newProfitValue = inv.accrued_return;
+    this.newProfitValue = 0;
     this.isEditModalOpen = true;
   }
 
   onSaveProfit() {
     this.store.dispatch(new UpdateAccruedReturn({
       investment_id: this.selectedInvestment.id,
-      accrued_return: this.newProfitValue
+      amount: this.newProfitValue
     })).subscribe(() => this.isEditModalOpen = false);
   }
 

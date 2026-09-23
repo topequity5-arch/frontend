@@ -5,6 +5,8 @@ import { environment } from '../../../environments/environment';
 
 export interface DashboardStats {
   total_net_worth: number;
+  total_principal: number;
+  total_accrued_return: number;
   growth_percentage: number;
   active_investments: number;
   ledger_balance: number;

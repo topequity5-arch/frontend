@@ -28,8 +28,10 @@
       </div>
       <div class="mt-12 flex gap-10 relative z-10">
         <div>
-          <p class="text-slate-500 text-[10px] font-black uppercase mb-1">Active Investments</p>
-          <p class="text-xl font-bold">{{ stats.active_investments | currency }}</p>
+                    <p class="text-slate-500 text-[10px] font-black uppercase mb-1">Total Principal</p>
+          <p class="text-xl font-bold">{{ stats.total_principal | currency }}</p>
+          <p class="text-slate-500 text-[10px] font-black uppercase mt-2 mb-1">Accrued Returns</p>
+          <p class="text-xl font-bold text-emerald-400">+{{ stats.total_accrued_return | currency }}</p>
         </div>
         <div class="border-l border-slate-800 pl-10">
           <p class="text-slate-500 text-[10px] font-black uppercase mb-1">Ledger Balance</p>
@@ -69,8 +71,9 @@
             <tr>
               <th class="px-8 py-4">Investment Plan</th>
               <th class="px-8 py-4">Status</th>
-              <th class="px-8 py-4">Value</th>
-              <th class="px-8 py-4 text-right">Profit</th>
+                            <th class="px-8 py-4">Value</th>
+              <th class="px-8 py-4">Profit</th>
+              <th class="px-8 py-4">APR</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
@@ -87,8 +90,9 @@
                   [ngClass]="item.status == 'active' ? 'text-blue-600 ': item.status == 'matured' ? 'text-emerald-600 ': 'text-red-600 '"
                   class="px-2 py-1 bg-emerald-50 text-[10px] font-black rounded uppercase">{{item.status}}</span>
               </td>
-              <td class="px-8 py-5 text-sm font-bold text-slate-700">{{ item.capital | currency }}</td>
-              <td class="px-8 py-5 text-right font-black text-emerald-500">+{{ item.profit | currency }}</td>
+              <td class="px-8 py-5 text-sm font-bold text-slate-700">{{ item.total_value | currency }}</td>
+              <td class="px-8 py-5 text-sm font-black text-emerald-500">+{{ item.profit | currency }}</td>
+              <td class="px-8 py-5 text-sm font-black text-slate-600">{{ item.interest_rate }}%</td>
             </tr>
             }
           </tbody>

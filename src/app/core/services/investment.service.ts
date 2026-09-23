@@ -32,8 +32,12 @@ export class InvestmentsService {
     return this.http.post(`${this.API_URL}/${id}/mature`, {});
   }
 
-  updateReturn(dto: { investment_id: string, accrued_return: number }) {
+  updateReturn(dto: { investment_id: string; amount: number }) {
     return this.http.patch(`${this.API_URL}/return`, dto);
+  }
+
+  withdrawAccruedReturn(id: string, dto: { amount: number }) {
+    return this.http.post(`${this.API_URL}/${id}/withdraw`, dto);
   }
 
 
