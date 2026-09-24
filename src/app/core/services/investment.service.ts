@@ -42,9 +42,18 @@ export class InvestmentsService {
 
 
   createInvestment(payload: any) {
-    return this.http.post(`${this.API_URL}`, payload);
+    return this.http.post(`${this.API_URL}/admin`, payload);
   }
   
+  /**
+   * Force-run monthly accrual on-demand (admin only).
+   * Useful for testing without waiting for the monthly cron.
+   */
+  triggerAccrual() {
+    return this.http.post(this.API_URL + '/admin/accrue', {});
+  }
+
+
   getUserInvestments() {
     return this.http.get(`${this.API_URL}/me`);
   }

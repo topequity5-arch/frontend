@@ -24,7 +24,7 @@ export class UsersApiService {
 
     async fetchOne(userId: string): Promise<{ user: User }> {
         const user = await lastValueFrom(
-            this.http.get<User>(`${this.API_URL}/user/${userId}`)
+            this.http.get<User>(`${this.API_URL}/users/${userId}`)
         );
         return { user };
     }

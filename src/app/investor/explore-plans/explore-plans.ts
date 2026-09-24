@@ -42,6 +42,7 @@ export class ExplorePlans implements OnInit {
     let userWalletId = ''
     this.user$.pipe(take(1)).subscribe((e) => {
       userWalletId = e?.wallet?.id ?? '';
+      console.log(userWalletId);
     });
 
     const payload = {

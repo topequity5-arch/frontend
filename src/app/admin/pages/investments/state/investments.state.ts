@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { tap, finalize, catchError, of } from 'rxjs';
 import { SetLoading } from '../../../../auth/state/auth.actions';
 import { InvestmentsService } from '../../../../core/services/investment.service';
-import { FetchAllInvestments, MatureInvestment, UpdateAccruedReturn } from './investments.actions';
+import { FetchAllInvestments, MatureInvestment, UpdateAccruedReturn, TriggerAccrual, CreateTestInvestment } from './investments.actions';
 import { NotificationService } from '../../../../core/services/notification.service';
 
 
@@ -60,7 +60,23 @@ export class InvestmentState {
         );
     }
 
-        @Action(UpdateAccruedReturn)
+        @Action(TriggerAccrual)
+  triggerAccrual(ctx: StateContext<InvestmentStateModel>) {
+    ctx.dispatch(new SetLoading(true));
+    return this.service.triggerAccrual().pipe(
+      tap(() => {
+        this.notify.show('Accrual triggered successfully', 'success');
+        ctx.dispatch(new FetchAllInvestments());
+      }),
+      catchError(err => {
+        this.notify.show(err.error?.message || 'Failed to trigger accrual', 'error');
+        return of(err);
+      }),
+      finalize(() => ctx.dispatch(new SetLoading(false)))
+    );
+  }
+
+      @Action(UpdateAccruedReturn)
     updateAccruedReturn(ctx: StateContext<InvestmentStateModel>, { payload }: UpdateAccruedReturn) {
         ctx.dispatch(new SetLoading(true));
 
@@ -79,6 +95,23 @@ export class InvestmentState {
             }),
             finalize(() => ctx.dispatch(new SetLoading(false)))
 
+        );
+    }
+
+    @Action(CreateTestInvestment)
+    createTestInvestment(ctx: StateContext<InvestmentStateModel>, { payload }: CreateTestInvestment) {
+        ctx.dispatch(new SetLoading(true));
+
+        return this.service.createInvestment(payload).pipe(
+            tap(() => {
+                ctx.dispatch(new FetchAllInvestments());
+                this.notify.show('Test investment created successfully', 'success');
+            }),
+            catchError((err) => {
+                this.notify.show(err.error?.message || 'Failed to create test investment', 'error');
+                return of(err);
+            }),
+            finalize(() => ctx.dispatch(new SetLoading(false)))
         );
     }
 }

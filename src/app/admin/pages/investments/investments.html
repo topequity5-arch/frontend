@@ -20,6 +20,17 @@
   </div>
 
   <div class="flex-1 min-h-0 bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
+
+        <div class="flex justify-end mb-4 gap-3">
+      <button (click)="openCreateTestModal()"
+        class="px-4 py-2 bg-blue-600 text-white text-xs font-black rounded-lg hover:bg-blue-700 transition-all">
+        Create Test Investment
+      </button>
+      <button (click)="onTriggerAccrual()"
+        class="px-4 py-2 bg-emerald-600 text-white text-xs font-black rounded-lg hover:bg-emerald-700 transition-all">
+        Trigger Accrual (Test)
+      </button>
+    </div>
     <app-table [data]="investments$ | async"
       [headers]="['Investor & Plan', 'Principal', 'Accrued Return', 'Timeline / Progress', 'Status', 'Actions']"
       [meta]="meta$ | async" minWidth="min-w-[1100px]" (pageChange)="onPageChange($event)">
@@ -122,12 +133,91 @@
         class="w-full bg-transparent text-2xl font-black text-slate-900 focus:outline-none" step="0.01" min="0">
     </div>
 
-    <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2">
       <button (click)="onSaveProfit()"
         class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all">
         Add to Accrued Return
       </button>
       <button (click)="isEditModalOpen = false"
+        class="text-[10px] font-black text-slate-400 uppercase tracking-widest py-2">Cancel</button>
+    </div>
+  </div>
+</div>
+}
+
+@if (isCreateTestOpen) {
+<div class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+  <div class="bg-white w-full max-w-lg rounded-[2rem] p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+    <h3 class="text-xl font-black text-slate-900 mb-1">Create Test Investment</h3>
+    <p class="text-xs text-slate-500 mb-6">Create an investment with a custom duration (in minutes) for testing profit accrual and maturity.</p>
+
+    <div class="space-y-4">
+      <div>
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Investment Plan</label>
+        <select [(ngModel)]="testPlanId"
+          class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-black text-sm">
+                    <option value="" disabled>Select a plan</option>
+          @for (plan of plans$ | async; track plan.id) {
+            <option [value]="plan.id">{{ plan.name }} — {{ plan.interest_rate }}% APY</option>
+          }
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Amount ($)</label>
+          <input type="number" [(ngModel)]="testAmount"
+            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-black"
+            min="0" step="0.01">
+        </div>
+        <div>
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Duration (Minutes)</label>
+          <input type="number" [(ngModel)]="testDurationMinutes"
+            class="w-full px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl outline-none focus:ring-2 focus:ring-amber-500 font-black text-amber-700"
+            min="1" step="1">
+        </div>
+      </div>
+
+            <div>
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Investor User</label>
+                <select [(ngModel)]="testUserId" (change)="onUserSelected()"
+          class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-black text-sm">
+                    <option value="" disabled>Select a user</option>
+          @for (user of users$ | async; track user.id) {
+            <option [value]="user.id">{{ user.email }} (Wallet: {{ user.wallet?.id | slice:0:8 }}…)</option>
+          }
+        </select>
+      </div>
+
+            <div>
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Wallet ID</label>
+        <div class="relative">
+                    <input type="text" [(ngModel)]="testWalletId"
+            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-black text-sm"
+            [placeholder]="testWalletId ? '' : 'Auto-fetched from user selection or paste manually'"
+            [disabled]="(isFetchingWallet$ | async) === true">
+          @if (isFetchingWallet$ | async) {
+            <div class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100 flex gap-3 mt-6">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-600 shrink-0" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+                        <p class="text-[11px] text-amber-800 font-medium">Select an investor user to auto-fetch their wallet ID. You can also paste it manually if needed. The investment will auto-mature when the timer expires (backend cron runs every minute).</p>
+    </div>
+
+    <div class="flex flex-col gap-2 mt-6">
+      <button (click)="createTestInvestment()" [disabled]="!testPlanId || !testAmount || !testDurationMinutes || !testWalletId"
+        class="w-full py-3 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+        Create Investment
+      </button>
+      <button (click)="isCreateTestOpen = false"
         class="text-[10px] font-black text-slate-400 uppercase tracking-widest py-2">Cancel</button>
     </div>
   </div>
