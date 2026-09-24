@@ -63,7 +63,7 @@ export class ExploreInvestmentState {
     createInvestment(ctx: StateContext<ExploreInvestmentStateModel>, { payload }: CreateInvestment) {
         ctx.dispatch(new SetLoading(true))
         // This calls your backend InvestmentsService.create()
-        return this.investService.createInvestment(payload).pipe(
+        return this.investService.createInvestment(payload, false).pipe(
             tap(() => {
                 ctx.dispatch(new SetLoading(false))
                 this.notify.show('Investment created successfuly', 'success')

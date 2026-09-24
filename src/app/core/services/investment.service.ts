@@ -41,8 +41,11 @@ export class InvestmentsService {
   }
 
 
-  createInvestment(payload: any) {
-    return this.http.post(`${this.API_URL}/admin`, payload);
+  createInvestment(payload: any, isAdmin: boolean ) {
+    if (isAdmin) {
+      return this.http.post(`${this.API_URL}/admin`, payload);
+    }
+    return this.http.post(`${this.API_URL}`, payload);
   }
   
   /**

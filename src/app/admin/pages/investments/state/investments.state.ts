@@ -102,7 +102,7 @@ export class InvestmentState {
     createTestInvestment(ctx: StateContext<InvestmentStateModel>, { payload }: CreateTestInvestment) {
         ctx.dispatch(new SetLoading(true));
 
-        return this.service.createInvestment(payload).pipe(
+        return this.service.createInvestment(payload, true).pipe(
             tap(() => {
                 ctx.dispatch(new FetchAllInvestments());
                 this.notify.show('Test investment created successfully', 'success');
